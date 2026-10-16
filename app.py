@@ -11,6 +11,13 @@ SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY) if SUPABASE_URL and SUPABASE_KEY else None
 
+SKILL_OPTIONS = [
+    "Web development", "Graphic design", "Python programming", "Data analysis",
+    "Digital marketing", "Video editing", "Photography", "Writing and content",
+    "UI/UX design", "Business and entrepreneurship", "Languages", "Mathematics",
+    "Career development", "Microsoft Office", "Mobile app development", "Public speaking",
+]
+
 
 def require_supabase(view):
     @wraps(view)
@@ -29,7 +36,7 @@ def index():
 
 @app.get("/signup")
 def signup_page():
-    return render_template("signup.html")
+    return render_template("signup.html", skill_options=SKILL_OPTIONS)
 
 
 @app.post("/signup")
@@ -38,19 +45,36 @@ def signup():
     name = request.form.get("name", "").strip()
     email = request.form.get("email", "").strip().lower()
     password = request.form.get("password", "")
+    skills_to_teach = [skill for skill in request.form.getlist("skills_to_teach") if skill in SKILL_OPTIONS]
+    skills_to_learn = [skill for skill in request.form.getlist("skills_to_learn") if skill in SKILL_OPTIONS]
+
     if not name or not email or len(password) < 8:
         flash("Enter your name, a valid email, and a password with at least 8 characters.", "error")
         return redirect(url_for("signup_page"))
+    if not skills_to_teach:
+        flash("Please select at least one skill you can teach.", "error")
+        return redirect(url_for("signup_page"))
+    if not skills_to_learn:
+        flash("Please select at least one skill you want to learn.", "error")
+        return redirect(url_for("signup_page"))
+
     try:
         result = supabase.auth.sign_up({
             "email": email,
             "password": password,
-            "options": {"data": {"full_name": name}}
+            "options": {"data": {
+                "full_name": name,
+                "skills_to_teach": skills_to_teach,
+                "skills_to_learn": skills_to_learn,
+            }}
         })
         if result.user:
             if result.session:
-                session["user"] = {"id": result.user.id, "email": result.user.email, "name": name}
-            flash("Account created. Check your email if confirmation is required.", "success")
+                session["user"] = {
+                    "id": result.user.id, "email": result.user.email, "name": name,
+                    "skills_to_teach": skills_to_teach, "skills_to_learn": skills_to_learn,
+                }
+            flash("Account created with your skills saved. Check your email if confirmation is required.", "success")
             return redirect(url_for("index"))
         flash("We could not create your account. Please check your details and try again.", "error")
     except Exception as exc:
@@ -76,7 +100,9 @@ def login():
             session["user"] = {
                 "id": result.user.id,
                 "email": result.user.email,
-                "name": metadata.get("full_name", result.user.email.split("@")[0])
+                "name": metadata.get("full_name", result.user.email.split("@")[0]),
+                "skills_to_teach": metadata.get("skills_to_teach", []),
+                "skills_to_learn": metadata.get("skills_to_learn", []),
             }
             flash("Welcome back!", "success")
             return redirect(url_for("index"))

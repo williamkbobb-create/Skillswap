@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <div class="hero-copy">
+    <div class="eyebrow"><span class="eyebrow-dot"></span> YOUR NEXT SKILL IS CLOSER THAN YOU THINK</div>
+    <h1>Learn a skill.<br>Share your <span class="gradient-text">own.</span></h1>
+    <p class="hero-description">SkillSwap connects people who want to learn with people who have something valuable to teach. Exchange knowledge, build confidence, and grow together.</p>
+    <div class="hero-actions">
+      {% if user %}<a class="button" href="#how-it-works">Explore SkillSwap <span>↗</span></a>{% else %}<a class="button" href="{{ url_for('signup_page') }}">Create your free account <span>↗</span></a>{% endif %}
+      <a class="text-link" href="#how-it-works"><span class="play-icon">▶</span> See how it works</a>
+    </div>
+    <div class="social-proof"><div class="avatar-stack"><span>A</span><span>M</span><span>K</span><span>+</span></div><div><strong>Real people. Useful skills.</strong><small>A community built around mutual growth.</small></div></div>
+  </div>
+  <div class="hero-art" aria-label="Illustration of people exchanging skills">
+    <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+    <div class="float-card card-code"><span class="card-icon purple">⌘</span><span><strong>Web development</strong><small>Share what you know</small></span><b>↗</b></div>
+    <div class="float-card card-design"><span class="card-icon orange">✳</span><span><strong>Graphic design</strong><small>Learn something new</small></span><b>↗</b></div>
+    <div class="center-emblem"><div class="emblem-ring">S</div><span>SKILLS IN<br>EXCHANGE</span></div>
+    <div class="art-tag tag-top">LEARN <span>✦</span> SHARE</div><div class="art-tag tag-bottom">GROW TOGETHER ↗</div>
+    <span class="spark spark-one">✦</span><span class="spark spark-two">✳</span><span class="spark spark-three">·</span>
+  </div>
+</section>
+<section class="value-strip"><div><span class="value-icon">↔</span><span><strong>Give and get</strong><small>Trade knowledge, not money</small></span></div><div><span class="value-icon">◎</span><span><strong>Learn by doing</strong><small>Build real-world confidence</small></span></div><div><span class="value-icon">✦</span><span><strong>Grow your network</strong><small>Meet people who inspire you</small></span></div></section>
+<section class="how-section" id="how-it-works"><div class="section-heading"><div class="eyebrow">SIMPLE BY DESIGN</div><h2>Make your skills <span class="gradient-text">go further.</span></h2><p>A better way to learn starts with sharing what you already know.</p></div><div class="steps-grid"><article class="step-card"><span class="step-number">01</span><div class="step-symbol">◈</div><h3>Show your skills</h3><p>Tell the community what you can teach and what you want to learn.</p></article><article class="step-card"><span class="step-number">02</span><div class="step-symbol">⇄</div><h3>Find your match</h3><p>Connect with people whose skills complement your goals.</p></article><article class="step-card"><span class="step-number">03</span><div class="step-symbol">↗</div><h3>Learn and exchange</h3><p>Share knowledge, practise together, and celebrate your progress.</p></article></div></section>
+<section class="bottom-cta"><div><div class="eyebrow">YOUR KNOWLEDGE HAS VALUE</div><h2>What can you teach<br>someone today?</h2></div><a class="button button-light" href="{{ url_for('signup_page') }}">Join SkillSwap <span>↗</span></a></section>
+{% endblock %}

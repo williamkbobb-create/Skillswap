@@ -13,6 +13,7 @@
     <h2>Create your account</h2>
     <p class="form-intro">Tell us a little about yourself and the skills you want to exchange.</p>
     <form method="post" action="{{ url_for('signup') }}" class="auth-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <label for="name">Full name</label>
       <input id="name" name="name" type="text" autocomplete="name" placeholder="Your full name" required maxlength="100">
       <label for="email">Email address</label>

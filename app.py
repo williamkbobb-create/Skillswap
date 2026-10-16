@@ -1,11 +1,24 @@
 import os
+import re
 from functools import wraps
 
 from flask import Flask, flash, redirect, render_template, request, session, url_for
+from flask_wtf.csrf import CSRFProtect
 from supabase import create_client
 
+_secret_key = os.environ.get("FLASK_SECRET_KEY")
+if not _secret_key:
+    raise RuntimeError("FLASK_SECRET_KEY must be set before SkillSwap starts.")
+
 app = Flask(__name__)
-app.secret_key = os.environ.get("FLASK_SECRET_KEY", "change-this-before-production")
+app.config.update(
+    SECRET_KEY=_secret_key,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SECURE=os.environ.get("SESSION_COOKIE_SECURE", "true").strip().lower()
+    in {"1", "true", "yes", "on"},
+    SESSION_COOKIE_SAMESITE="Lax",
+)
+csrf = CSRFProtect(app)
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
@@ -17,6 +30,8 @@ SKILL_OPTIONS = [
     "UI/UX design", "Business and entrepreneurship", "Languages", "Mathematics",
     "Career development", "Microsoft Office", "Mobile app development", "Public speaking",
 ]
+
+_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
 def require_supabase(view):
@@ -48,7 +63,7 @@ def signup():
     skills_to_teach = [skill for skill in request.form.getlist("skills_to_teach") if skill in SKILL_OPTIONS]
     skills_to_learn = [skill for skill in request.form.getlist("skills_to_learn") if skill in SKILL_OPTIONS]
 
-    if not name or not email or len(password) < 8:
+    if not name or len(name) > 100 or not _EMAIL_RE.fullmatch(email) or len(password) < 8:
         flash("Enter your name, a valid email, and a password with at least 8 characters.", "error")
         return redirect(url_for("signup_page"))
     if not skills_to_teach:
@@ -77,8 +92,9 @@ def signup():
             flash("Account created with your skills saved. Check your email if confirmation is required.", "success")
             return redirect(url_for("index"))
         flash("We could not create your account. Please check your details and try again.", "error")
-    except Exception as exc:
-        app.logger.warning("Signup failed: %s", str(exc))
+    except Exception:
+        # Do not write provider exception details, emails, or other auth data to logs.
+        app.logger.warning("Signup failed because Supabase Auth rejected the request.")
         flash("We could not create your account. The email may already be registered, or Supabase may need configuration.", "error")
     return redirect(url_for("signup_page"))
 
@@ -93,10 +109,14 @@ def login_page():
 def login():
     email = request.form.get("email", "").strip().lower()
     password = request.form.get("password", "")
+    if not _EMAIL_RE.fullmatch(email) or not password:
+        flash("Login failed. Check your email and password, then try again.", "error")
+        return redirect(url_for("login_page"))
     try:
         result = supabase.auth.sign_in_with_password({"email": email, "password": password})
         if result.user:
             metadata = result.user.user_metadata or {}
+            session.clear()
             session["user"] = {
                 "id": result.user.id,
                 "email": result.user.email,
@@ -106,8 +126,9 @@ def login():
             }
             flash("Welcome back!", "success")
             return redirect(url_for("index"))
-    except Exception as exc:
-        app.logger.warning("Login failed: %s", str(exc))
+    except Exception:
+        # Keep auth provider details out of application logs and user-visible errors.
+        app.logger.warning("Login failed because Supabase Auth rejected the request.")
     flash("Login failed. Check your email and password, then try again.", "error")
     return redirect(url_for("login_page"))
 

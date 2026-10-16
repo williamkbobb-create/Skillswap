@@ -17,7 +17,7 @@
       <a href="{{ url_for('index') }}#how-it-works">How it works</a>
       {% if user %}
         <span class="nav-user">Hi, {{ user.name or user.email }}</span>
-        <form class="inline-form" action="{{ url_for('logout') }}" method="post"><button class="nav-link" type="submit">Log out</button></form>
+        <form class="inline-form" action="{{ url_for('logout') }}" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="nav-link" type="submit">Log out</button></form>
       {% else %}
         <a href="{{ url_for('login_page') }}">Log in</a>
         <a class="button button-small" href="{{ url_for('signup_page') }}">Get started <span aria-hidden="true">↗</span></a>

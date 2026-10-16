@@ -2,6 +2,7 @@ import os
 import re
 import subprocess
 import sys
+from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import Mock
 
@@ -12,6 +13,7 @@ os.environ.setdefault("SESSION_COOKIE_SECURE", "false")
 os.environ.pop("SUPABASE_URL", None)
 os.environ.pop("SUPABASE_KEY", None)
 
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import app as skillswap
 
 

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1020">
+  <title>{% block title %}SkillSwap — Trade skills, grow together{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="{{ url_for('index') }}"><span class="brand-mark">S</span><span>Skill<span class="brand-accent">Swap</span></span></a>
+    <nav>
+      <a href="{{ url_for('index') }}#how-it-works">How it works</a>
+      {% if user %}
+        <span class="nav-user">Hi, {{ user.name or user.email }}</span>
+        <form class="inline-form" action="{{ url_for('logout') }}" method="post"><button class="nav-link" type="submit">Log out</button></form>
+      {% else %}
+        <a href="{{ url_for('login_page') }}">Log in</a>
+        <a class="button button-small" href="{{ url_for('signup_page') }}">Get started <span aria-hidden="true">↗</span></a>
+      {% endif %}
+    </nav>
+  </header>
+  <main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}<div class="flash-wrap">{% for category, message in messages %}<div class="flash flash-{{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer><a class="brand brand-footer" href="{{ url_for('index') }}"><span class="brand-mark">S</span><span>Skill<span class="brand-accent">Swap</span></span></a><span>Skills grow faster when we share them.</span><span>© 2026 SkillSwap</span></footer>
+</body>
+</html>

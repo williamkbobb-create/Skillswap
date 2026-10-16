@@ -1,5 +1,66 @@
 {% extends "base.html" %}
 {% block title %}Create account — SkillSwap{% endblock %}
 {% block content %}
-<section class="auth-layout"><div class="auth-story"><div class="eyebrow"><span class="eyebrow-dot"></span> START SOMETHING GOOD</div><h1>Your next chapter starts with <span class="gradient-text">sharing.</span></h1><p>Join a community where everyone has something to teach and everyone has something to learn.</p><div class="auth-quote"><span>“</span><p>The best way to learn is to learn together.</p></div></div><div class="auth-card"><div class="auth-card-top"><span class="auth-mini-mark">S</span><span class="muted-label">FREE COMMUNITY ACCOUNT</span></div><h2>Create your account</h2><p class="form-intro">Start sharing your skills today.</p><form method="post" action="{{ url_for('signup') }}" class="auth-form"><label for="name">Full name</label><input id="name" name="name" type="text" autocomplete="name" placeholder="Your full name" required maxlength="100"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="new-password" placeholder="At least 8 characters" minlength="8" required><button class="button auth-submit" type="submit">Create account <span>↗</span></button></form><p class="auth-switch">Already have an account? <a href="{{ url_for('login_page') }}">Log in</a></p><p class="privacy-note">By creating an account, you agree to use SkillSwap respectfully and responsibly.</p></div></section>
+<section class="auth-layout signup-layout">
+  <div class="auth-story">
+    <div class="eyebrow"><span class="eyebrow-dot"></span> START SOMETHING GOOD</div>
+    <h1>Your next chapter starts with <span class="gradient-text">sharing.</span></h1>
+    <p>Join a community where everyone has something to teach and everyone has something to learn.</p>
+    <div class="auth-quote"><span>“</span><p>The best way to learn is to learn together.</p></div>
+  </div>
+  <div class="auth-card signup-card">
+    <div class="auth-card-top"><span class="auth-mini-mark">S</span><span class="muted-label">FREE COMMUNITY ACCOUNT</span></div>
+    <h2>Create your account</h2>
+    <p class="form-intro">Tell us a little about yourself and the skills you want to exchange.</p>
+    <form method="post" action="{{ url_for('signup') }}" class="auth-form">
+      <label for="name">Full name</label>
+      <input id="name" name="name" type="text" autocomplete="name" placeholder="Your full name" required maxlength="100">
+      <label for="email">Email address</label>
+      <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" autocomplete="new-password" placeholder="At least 8 characters" minlength="8" required>
+
+      <fieldset class="skill-fieldset">
+        <legend>Skills I can teach <span>*</span></legend>
+        <p class="skill-hint">Select one or more skills you can share with others.</p>
+        <div class="skill-grid">
+          {% for skill in skill_options %}
+          <label class="skill-option"><input type="checkbox" name="skills_to_teach" value="{{ skill }}"><span>{{ skill }}</span></label>
+          {% endfor %}
+        </div>
+      </fieldset>
+
+      <fieldset class="skill-fieldset">
+        <legend>Skills I want to learn <span>*</span></legend>
+        <p class="skill-hint">Choose the skills you would like to learn from the community.</p>
+        <div class="skill-grid">
+          {% for skill in skill_options %}
+          <label class="skill-option"><input type="checkbox" name="skills_to_learn" value="{{ skill }}"><span>{{ skill }}</span></label>
+          {% endfor %}
+        </div>
+      </fieldset>
+
+      <button class="button auth-submit" type="submit">Create account <span>↗</span></button>
+    </form>
+    <p class="auth-switch">Already have an account? <a href="{{ url_for('login_page') }}">Log in</a></p>
+    <p class="privacy-note">By creating an account, you agree to use SkillSwap respectfully and responsibly.</p>
+  </div>
+</section>
+<style>
+.signup-layout{grid-template-columns:minmax(0,1fr) minmax(0,560px);gap:55px;align-items:start}
+.signup-card{width:100%}
+.skill-fieldset{border:0;border-top:1px solid var(--line);padding:19px 0 0;margin:7px 0 18px;min-width:0}
+.skill-fieldset legend{padding:0 8px 0 0;font-size:14px;font-weight:700;color:#f6f7fb}
+.skill-fieldset legend span{color:var(--mint)}
+.skill-hint{font-size:11px;color:var(--muted);margin:3px 0 13px}
+.skill-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.skill-option{position:relative;display:flex;align-items:center;gap:9px;min-height:43px;padding:9px 10px;border:1px solid #2b344a;border-radius:10px;background:#0c1222;color:#cfd5e6;font-size:11px;font-weight:500;cursor:pointer;transition:border-color .15s,background .15s}
+.skill-option:has(input:checked){border-color:var(--mint);background:#153329;color:#e7fff5}
+.skill-option input{appearance:none;-webkit-appearance:none;flex:0 0 16px;width:16px;height:16px;padding:0;margin:0;border:1px solid #66728b;border-radius:4px;background:#10182a;cursor:pointer}
+.skill-option input:checked{background:var(--mint);border-color:var(--mint)}
+.skill-option input:checked:after{content:'✓';display:block;color:#0b1020;font-size:12px;font-weight:800;line-height:14px;text-align:center}
+.skill-option input:focus-visible{outline:2px solid var(--purple);outline-offset:3px}
+@media(max-width:900px){.signup-layout{grid-template-columns:1fr;gap:30px}.signup-card{max-width:600px;margin:auto}.signup-layout .auth-story{max-width:600px}}
+@media(max-width:480px){.skill-grid{grid-template-columns:1fr}.skill-option{font-size:12px;min-height:45px}.signup-card{padding:23px 18px}}
+</style>
 {% endblock %}
